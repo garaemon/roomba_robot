@@ -46,20 +46,28 @@ catkin_package(
   )
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(irobot_oi SHARED src/iRobot/OpenInterface.cpp)
+add_dependencies(irobot_oi ${PROJECT_NAME}_gencpp)
+target_link_libraries(irobot_oi ${catkin_LIBRARIES})
+
 add_library(go_dock SHARED src/GoDock/GoDock.cpp)
 target_link_libraries(go_dock ${catkin_LIBRARIES})
-target_link_libraries(irobot_oi ${catkin_LIBRARIES})
+add_dependencies(go_dock ${PROJECT_NAME}_gencpp)
 
 add_executable(roomba560_node src/roomba560.cpp src/iRobot/OpenInterface.cpp src/GoDock/GoDock.cpp)
 target_link_libraries(roomba560_node ${catkin_LIBRARIES})
+add_dependencies(roomba560_node ${PROJECT_NAME}_gencpp)
 
 add_executable(roomba500_light_node src/roomba500_lightweight.cpp src/iRobot/OpenInterface.cpp)
 target_link_libraries(roomba500_light_node ${catkin_LIBRARIES})
+add_dependencies(roomba500_light_node ${PROJECT_NAME}_gencpp)
 
 add_executable(godock_server src/godock_server.cpp src/GoDock/GoDock.cpp)
 target_link_libraries(godock_server ${catkin_LIBRARIES})
+add_dependencies(godock_server ${PROJECT_NAME}_gencpp)
+
 add_executable(godock_client src/godock_client.cpp)
 target_link_libraries(godock_client ${catkin_LIBRARIES})
+add_dependencies(godock_client ${PROJECT_NAME}_gencpp)
 
 install(TARGETS godock_client godock_server roomba500_light_node roomba560_node irobot_oi go_dock
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
