@@ -9,7 +9,7 @@ project(roomba_500_series)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
-find_package(catkin REQUIRED COMPONENTS geometry_msgs actionlib_msgs)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs actionlib_msgs cereal_port)
 add_message_files(
   DIRECTORY msg
   FILES Battery.msg
@@ -29,6 +29,8 @@ add_message_files(
   Bumper.msg
   )
 
+
+
 add_action_files(
   DIRECTORY action
   FILES GoDock.action
@@ -38,33 +40,15 @@ generate_messages(
   DEPENDENCIES geometry_msgs actionlib_msgs
 )
 
-# rosbuild_find_ros_package(actionlib_msgs)
-# include(${actionlib_msgs_PACKAGE_PATH}/cmake/actionbuild.cmake)
-# genaction()
+catkin_package(
+  DEPENDS
+  CATKIN_DEPENDS geometry_msgs actionlib_msgs
+  )
 
-# rosbuild_init()
-
-# #set the default path for built executables to the "bin" directory
-# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-# #set the default path for built libraries to the "lib" directory
-# set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-# #uncomment if you have defined messages
-# rosbuild_genmsg()
-# #uncomment if you have defined services
-# #rosbuild_gensrv()
-
-# #common commands for building c++ executables and libraries
-# #rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-# #target_link_libraries(${PROJECT_NAME} another_library)
-# #rosbuild_add_boost_directories()
-# #rosbuild_link_boost(${PROJECT_NAME} thread)
-# #rosbuild_add_executable(example examples/example.cpp)
-# #target_link_libraries(example ${PROJECT_NAME})
-
-# rosbuild_add_library(irobot_oi src/iRobot/OpenInterface.cpp)
-# rosbuild_add_library(go_dock src/GoDock/GoDock.cpp)
-
+add_library(irobot_oi SHARED src/iRobot/OpenInterface.cpp)
+add_library(go_dock SHARED src/GoDock/GoDock.cpp)
+target_link_libraries(go_dock ${catkin_LIBRARIES})
+target_link_libraries(irobot_oi ${catkin_LIBRARIES})
 # rosbuild_add_executable(roomba560_node src/roomba560.cpp src/iRobot/OpenInterface.cpp src/GoDock/GoDock.cpp)
 # target_link_libraries(roomba560_node cereal_port)
 
