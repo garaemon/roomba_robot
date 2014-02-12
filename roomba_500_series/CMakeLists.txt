@@ -9,7 +9,7 @@ project(roomba_500_series)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
-find_package(catkin REQUIRED COMPONENTS geometry_msgs actionlib_msgs cereal_port tf)
+find_package(catkin REQUIRED COMPONENTS geometry_msgs actionlib_msgs cereal_port tf nav_msgs)
 add_message_files(
   DIRECTORY msg
   FILES Battery.msg
