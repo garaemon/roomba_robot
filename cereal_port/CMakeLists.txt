@@ -12,6 +12,9 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 add_library(cereal_port SHARED src/CerealPort.cpp)
 target_link_libraries(cereal_port ${catkin_LIBRARIES})
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 install(TARGETS cereal_port
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
