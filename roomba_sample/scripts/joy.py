@@ -15,9 +15,9 @@ def joyCB(msg):
   # 7 -> u/d
   twist = Twist()
   if msg.axes[6] > 0:
-    twist.angular.z = 0.3
+    twist.angular.z = 1.0
   elif msg.axes[6] < 0:
-    twist.angular.z = -0.3
+    twist.angular.z = -1.0
   if msg.axes[7] > 0:
     twist.linear.x = 0.3
   elif msg.axes[7] < 0:
