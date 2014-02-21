@@ -19,9 +19,9 @@ def joyCB(msg):
   elif msg.axes[6] < 0:
     twist.angular.z = -0.3
   if msg.axes[7] > 0:
-    twist.linear.x = 0.1
+    twist.linear.x = 0.3
   elif msg.axes[7] < 0:
-    twist.linear.x = -0.1
+    twist.linear.x = -0.3
   twist_pub.publish(twist)
 
 def odomCB(msg):
