@@ -28,13 +28,11 @@ def odomCB(msg):
   global digits_pub
   distance = math.sqrt(msg.pose.pose.position.x * msg.pose.pose.position.x + msg.pose.pose.position.y * msg.pose.pose.position.y)
   # mm
-  print distance
   distance_mm = distance
   digits_nums = [int(math.floor(distance_mm / 1000.0)) % 10,
                  int(math.floor(distance_mm / 100.0))  % 10,
                  int(math.floor(distance_mm / 10.0))   % 10,
                  int(math.floor(distance_mm / 1.0))      % 10]
-  print digits_nums
   digits_codes = [ord('0') + v for v in reversed(digits_nums)]   #digits[0] => 1 order
   digits = DigitLeds()
   digits.header.stamp = rospy.Time.now()
