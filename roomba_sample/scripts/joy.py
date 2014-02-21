@@ -5,9 +5,10 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy 
 from nav_msgs.msg import Odometry
-from roomba_500_series.msg import DigitLeds, Song, Note, PlaySong
+from roomba_500_series.msg import DigitLeds, Song, Note, PlaySong, GoDockAction, GoDockGoal
 from std_msgs.msg import Bool
 import math
+import actionlib
 twist_pub = None
 
 def joyCB(msg):
@@ -30,9 +31,20 @@ def joyCB(msg):
     brush_pub.publish(Bool(False))
   if msg.buttons[0] == 1:
     factor = 10.0
+  elif msg.buttons[3] == 1:
+    factor = 10.0
     play_song_pub.publish(PlaySong(song_number=0))
   else:
     play_song_pub.publish(PlaySong(song_number=1))
+  if msg.buttons[7] == 1:
+    client = actionlib.SimpleActionClient('/godock', GoDockAction)
+    rospy.loginfo("waiting server..")
+    client.wait_for_server()
+    goal = GoDockGoal(timeout=rospy.Duration(20))
+    rospy.loginfo("sending goal")
+    client.send_goal(goal)
+    client.wait_for_result()
+    rospy.loginfo("done")
   twist.linear.x = twist.linear.x * factor
   twist.angular.z = twist.angular.z * factor
   twist_pub.publish(twist)
