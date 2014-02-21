@@ -1,7 +1,7 @@
 <launch>
   <node pkg="roomba_500_series"
-        type="roomba500_light_node"
-        name="roomba500_light_node">
+        type="roomba560_node"
+        name="roomba560_node">
   </node>
   <node pkg="cv_camera"
         type="cv_camera_node"
