@@ -5,13 +5,13 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy 
 from nav_msgs.msg import Odometry
-from roomba_500_series.msg import DigitLeds
+from roomba_500_series.msg import DigitLeds, Song, Note, PlaySong
 from std_msgs.msg import Bool
 import math
 twist_pub = None
 
 def joyCB(msg):
-  global twist_pub, brush_pub
+  global twist_pub, brush_pub, play_song_pub
   # 6 -> l/r
   # 7 -> u/d
   factor = 1.0
@@ -30,6 +30,9 @@ def joyCB(msg):
     brush_pub.publish(Bool(False))
   if msg.buttons[0] == 1:
     factor = 10.0
+    play_song_pub.publish(PlaySong(song_number=0))
+  else:
+    play_song_pub.publish(PlaySong(song_number=1))
   twist.linear.x = twist.linear.x * factor
   twist.angular.z = twist.angular.z * factor
   twist_pub.publish(twist)
@@ -49,16 +52,34 @@ def odomCB(msg):
   digits.digits = digits_codes
   digits_pub.publish(digits)
   
+ROOMBA_F = 77
+ROOMBA_D = 74
+ROOMBA_E = 76
+ROOMBA_C = 72
+ROOMBA_REST = 0
   
 def main():
-  global twist_pub, digits_pub, brush_pub
+  global twist_pub, digits_pub, brush_pub, play_song_pub
   rospy.init_node("roomba_joy_sample") # declare my name
   twist_pub = rospy.Publisher("/cmd_vel", Twist)
   digits_pub = rospy.Publisher("/digit_leds", DigitLeds)
   brush_pub = rospy.Publisher("/brush", Bool)
   joy_sub = rospy.Subscriber("/joy", Joy, joyCB)
-  
+  song_set_pub = rospy.Publisher("/song", Song)
+  play_song_pub = rospy.Publisher("/play_song", PlaySong)
   odom_sub = rospy.Subscriber("/odom", Odometry, odomCB)
+  
+  song = Song()
+  song.song_number = 0
+  notes = [ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_D, ROOMBA_F,
+           ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_D, ROOMBA_F, ROOMBA_D, ROOMBA_F, ROOMBA_REST,
+           ROOMBA_E, ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_C, ROOMBA_E,
+           ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_C, ROOMBA_E, ROOMBA_C, ROOMBA_E]
+  for note in notes:
+    song.notes.append(Note(note=note, length=8))
+  song_set_pub.publish(song)
+  
+  
   rospy.spin()                        #
 
 if __name__ == "__main__":

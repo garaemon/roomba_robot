@@ -354,7 +354,29 @@ int main(int argc, char** argv)
 		wheeldrop.right.header.stamp = current_time;
 		wheeldrop.right.state = roomba->wheel_drop_[RIGHT];
 		wheeldrop_pub.publish(wheeldrop);
-		
+
+    // define song here
+//     {
+// #define ROOMBA_F 77             // fa
+// #define ROOMBA_D 74             // re
+// #define ROOMBA_E 76             // mi
+// #define ROOMBA_C 72             // do
+// #define ROOMBA_REST 0             // do
+//       unsigned char notes[] = {
+//       ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_D, ROOMBA_F,
+//         ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_D, ROOMBA_F, ROOMBA_D, ROOMBA_F, ROOMBA_REST,
+//         ROOMBA_E, ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_C, ROOMBA_E,
+//         ROOMBA_REST, ROOMBA_E, ROOMBA_REST, ROOMBA_C, ROOMBA_E, ROOMBA_C, ROOMBA_E, ROOMBA_REST
+//         };
+//       unsigned char song_length = 32;
+//       unsigned char note_length = 8;
+//       unsigned char notes_length[32];
+//       for (size_t i = 0; i < 32; i++) {
+//       notes_length[i] = note_length;
+//     }
+//       roomba->setSong(0, song_length, notes, notes_length);
+//     }
+
 		ros::spinOnce();
 		r.sleep();
 	}
