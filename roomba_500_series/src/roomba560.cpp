@@ -75,6 +75,11 @@ void cmdVelReceived(const geometry_msgs::Twist::ConstPtr& cmd_vel)
 	roomba->drive(cmd_vel->linear.x, cmd_vel->angular.z);
 }
 
+void dockReceived(const std_msgs::Empty::ConstPtr& msg)
+{
+  roomba->goDock();
+}
+
 void ledsReceived(const roomba_500_series::Leds::ConstPtr& leds)
 {
 	roomba->setLeds(leds->warning, leds->dock, leds->spot, leds->dirt_detect, leds->clean_color, leds->clean_intensity);
@@ -164,6 +169,7 @@ int main(int argc, char** argv)
 	ros::Subscriber playsong_sub  = n.subscribe<roomba_500_series::PlaySong>("/play_song", 1, playSongReceived);
 	ros::Subscriber clean_sub  = n.subscribe<std_msgs::Empty>("/clean", 1, cleanReceived);
   ros::Subscriber brush_sub  = n.subscribe<std_msgs::Bool>("/brush", 1, brushReceived);
+  ros::Subscriber dock_sub = n.subscribe<std_msgs::Empty>("/dock", 1, dockReceived);
   
 	irobot::OI_Packet_ID sensor_packets[1] = {irobot::OI_PACKET_GROUP_0};
 	roomba->setSensorPackets(sensor_packets, 1, OI_PACKET_GROUP_0_SIZE);

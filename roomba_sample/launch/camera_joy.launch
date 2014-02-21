@@ -1,7 +1,8 @@
 <launch>
   <node pkg="roomba_500_series"
         type="roomba560_node"
-        name="roomba560_node">
+        name="roomba560_node"
+        respawn="true">
   </node>
   <node pkg="cv_camera"
         type="cv_camera_node"

@@ -5,14 +5,24 @@ import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy 
 from nav_msgs.msg import Odometry
-from roomba_500_series.msg import DigitLeds, Song, Note, PlaySong, GoDockAction, GoDockGoal
-from std_msgs.msg import Bool
+from roomba_500_series.msg import DigitLeds, Song, Note, PlaySong, GoDockAction, GoDockGoal, Battery
+from std_msgs.msg import Bool, Empty
 import math
 import actionlib
+import subprocess
+
 twist_pub = None
 
+roomba_kill_required = False
+
+def batteryCB(msg):
+  global roomba_kill_required
+  if msg.dock and roomba_kill_required:
+    subprocess.check_call(["bash", "-c", "source ~/.bashrc; rosnode kill roomba560_node;"])
+    roomba_kill_required = False
+
 def joyCB(msg):
-  global twist_pub, brush_pub, play_song_pub
+  global twist_pub, brush_pub, play_song_pub, godock_pub, roomba_kill_required
   # 6 -> l/r
   # 7 -> u/d
   factor = 1.0
@@ -37,14 +47,9 @@ def joyCB(msg):
   else:
     play_song_pub.publish(PlaySong(song_number=1))
   if msg.buttons[7] == 1:
-    client = actionlib.SimpleActionClient('/godock', GoDockAction)
-    rospy.loginfo("waiting server..")
-    client.wait_for_server()
-    goal = GoDockGoal(timeout=rospy.Duration(20))
-    rospy.loginfo("sending goal")
-    client.send_goal(goal)
-    client.wait_for_result()
-    rospy.loginfo("done")
+    godock_pub.publish(Empty())
+    roomba_kill_required = True
+    
   twist.linear.x = twist.linear.x * factor
   twist.angular.z = twist.angular.z * factor
   twist_pub.publish(twist)
@@ -71,16 +76,16 @@ ROOMBA_C = 72
 ROOMBA_REST = 0
   
 def main():
-  global twist_pub, digits_pub, brush_pub, play_song_pub
+  global twist_pub, digits_pub, brush_pub, play_song_pub, godock_pub
   rospy.init_node("roomba_joy_sample") # declare my name
   twist_pub = rospy.Publisher("/cmd_vel", Twist)
   digits_pub = rospy.Publisher("/digit_leds", DigitLeds)
   brush_pub = rospy.Publisher("/brush", Bool)
-  joy_sub = rospy.Subscriber("/joy", Joy, joyCB)
+  godock_pub = rospy.Publisher("/dock", Empty)
   song_set_pub = rospy.Publisher("/song", Song)
   play_song_pub = rospy.Publisher("/play_song", PlaySong)
   odom_sub = rospy.Subscriber("/odom", Odometry, odomCB)
-  
+  battery_sub = rospy.Subscriber("/battery", Battery, batteryCB)
   song = Song()
   song.song_number = 0
   notes = [ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_F, ROOMBA_REST, ROOMBA_D, ROOMBA_F,
@@ -91,7 +96,7 @@ def main():
     song.notes.append(Note(note=note, length=8))
   song_set_pub.publish(song)
   
-  
+  joy_sub = rospy.Subscriber("/joy", Joy, joyCB)
   rospy.spin()                        #
 
 if __name__ == "__main__":
