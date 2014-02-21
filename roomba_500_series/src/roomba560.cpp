@@ -54,6 +54,8 @@
 #include "roomba_500_series/OpenInterface.h"
 
 #include "roomba_500_series/GoDock.h"	// GoDock action
+#include "std_msgs/Empty.h"
+#include "std_msgs/Bool.h"
 
 #include <string>
 
@@ -104,6 +106,21 @@ void playSongReceived(const roomba_500_series::PlaySong::ConstPtr& song)
 	roomba->playSong(song->song_number);
 }
 
+void cleanReceived(const std_msgs::Empty::ConstPtr& msg)
+{
+  roomba->clean();
+}
+
+void brushReceived(const std_msgs::Bool::ConstPtr& msg)
+{
+  if (msg->data) {
+    roomba->brushes(1, 1, 1, 1, 1);
+  }
+  else {
+    roomba->brushes(0, 0, 0, 0, 0);
+  }
+}
+
 
 int main(int argc, char** argv)
 {
@@ -145,7 +162,9 @@ int main(int argc, char** argv)
 	ros::Subscriber digitleds_sub  = n.subscribe<roomba_500_series::DigitLeds>("/digit_leds", 1, digitLedsReceived);
 	ros::Subscriber song_sub  = n.subscribe<roomba_500_series::Song>("/song", 1, songReceived);
 	ros::Subscriber playsong_sub  = n.subscribe<roomba_500_series::PlaySong>("/play_song", 1, playSongReceived);
-	
+	ros::Subscriber clean_sub  = n.subscribe<std_msgs::Empty>("/clean", 1, cleanReceived);
+  ros::Subscriber brush_sub  = n.subscribe<std_msgs::Bool>("/brush", 1, brushReceived);
+  
 	irobot::OI_Packet_ID sensor_packets[1] = {irobot::OI_PACKET_GROUP_100};
 	roomba->setSensorPackets(sensor_packets, 1, OI_PACKET_GROUP_100_SIZE);
 

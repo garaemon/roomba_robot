@@ -6,22 +6,32 @@ from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Joy 
 from nav_msgs.msg import Odometry
 from roomba_500_series.msg import DigitLeds
+from std_msgs.msg import Bool
 import math
 twist_pub = None
 
 def joyCB(msg):
-  global twist_pub
+  global twist_pub, brush_pub
   # 6 -> l/r
   # 7 -> u/d
+  factor = 1.0
   twist = Twist()
   if msg.axes[6] > 0:
-    twist.angular.z = 1.0
+    twist.angular.z = 0.1
   elif msg.axes[6] < 0:
-    twist.angular.z = -1.0
+    twist.angular.z = -0.1
   if msg.axes[7] > 0:
-    twist.linear.x = 0.3
+    twist.linear.x = 0.1
   elif msg.axes[7] < 0:
-    twist.linear.x = -0.3
+    twist.linear.x = -0.1
+  if msg.buttons[2] == 1:
+    brush_pub.publish(Bool(True))
+  elif msg.buttons[1] == 1:
+    brush_pub.publish(Bool(False))
+  if msg.buttons[0] == 1:
+    factor = 10.0
+  twist.linear.x = twist.linear.x * factor
+  twist.angular.z = twist.angular.z * factor
   twist_pub.publish(twist)
 
 def odomCB(msg):
@@ -41,10 +51,11 @@ def odomCB(msg):
   
   
 def main():
-  global twist_pub, digits_pub
+  global twist_pub, digits_pub, brush_pub
   rospy.init_node("roomba_joy_sample") # declare my name
   twist_pub = rospy.Publisher("/cmd_vel", Twist)
   digits_pub = rospy.Publisher("/digit_leds", DigitLeds)
+  brush_pub = rospy.Publisher("/brush", Bool)
   joy_sub = rospy.Subscriber("/joy", Joy, joyCB)
   
   odom_sub = rospy.Subscriber("/odom", Odometry, odomCB)
