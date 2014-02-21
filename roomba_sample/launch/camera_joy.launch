@@ -1,0 +1,18 @@
+<launch>
+  <node pkg="roomba_500_series"
+        type="roomba500_light_node"
+        name="roomba500_light_node">
+  </node>
+  <node pkg="cv_camera"
+        type="cv_camera_node"
+        name="cv_camera" />
+  <node pkg="joy"
+        type="joy_node"
+        name="joy">
+    <param name="dev" value="/dev/input/js0" />
+  </node>
+  <node pkg="roomba_sample"
+        type="joy.py"
+        name="roomba_joy">
+  </node>
+</launch>
