@@ -165,8 +165,8 @@ int main(int argc, char** argv)
 	ros::Subscriber clean_sub  = n.subscribe<std_msgs::Empty>("/clean", 1, cleanReceived);
   ros::Subscriber brush_sub  = n.subscribe<std_msgs::Bool>("/brush", 1, brushReceived);
   
-	irobot::OI_Packet_ID sensor_packets[1] = {irobot::OI_PACKET_GROUP_100};
-	roomba->setSensorPackets(sensor_packets, 1, OI_PACKET_GROUP_100_SIZE);
+	irobot::OI_Packet_ID sensor_packets[1] = {irobot::OI_PACKET_GROUP_0};
+	roomba->setSensorPackets(sensor_packets, 1, OI_PACKET_GROUP_0_SIZE);
 
 	if( roomba->openSerialPort(true) == 0) ROS_INFO("Connected to Roomba.");
 	else
